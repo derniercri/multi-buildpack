@@ -15,6 +15,12 @@ function indent() {
 unset GIT_DIR
 
 for BUILDPACK in $(cat $1/.buildpacks); do
+  # Skip datadog buildpack if DISABLE_DATADOG_AGENT set to true
+  if [[ $BUILDPACK == *"heroku-buildpack-datadog"* ]] && [ "$DISABLE_DATADOG_AGENT" == "true" ]; then
+    echo "DISABLE_DATADOG_AGENT set to true, skipping buildpack Datadog..."
+    continue
+  fi
+
   dir=$(mktemp -t buildpackXXXXX)
   rm -rf $dir
 
@@ -81,4 +87,3 @@ done
 if [ -e $1/last_pack_release.out ]; then
   echo "Using release configuration from last framework ($framework)."
 fi
-
